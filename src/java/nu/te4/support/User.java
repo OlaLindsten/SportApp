@@ -5,6 +5,12 @@
  */
 package nu.te4.support;
 
+
+import bycrypttest.BCrypt;
+import com.mysql.jdbc.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Base64;
 import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
@@ -25,13 +31,33 @@ public class User {
             //plocka ut anv och lösenord
             String username = userPass.substring(0,userPass.indexOf(":"));
             String password = userPass.substring(userPass.indexOf(":")+1);
+            
+            Connection connection = ConnectionFactory.make("testServer");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE username =?");
+            stmt.setString(1, username);
+            ResultSet data = stmt.executeQuery();
+            data.next();
+            String hasedPass = data.getString("password");
+            connection.close();
             System.out.println(username);
             System.out.println(password);
-            if(username.equals("Albin") && password.equals("123")){
-                return true;
-            }
+            return BCrypt.checkpw(password, hasedPass);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error: "+e.getMessage());
+        }
+        return false;
+    }
+    
+    public static boolean createUser(String username, String password){
+       String hashpw = BCrypt.hashpw(password, BCrypt.gensalt());
+        try {
+            Connection connection = ConnectionFactory.make("testServer");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO users VALUES(?,?)");
+            stmt.setString(1, username);
+            stmt.setString(2, hashpw);
+            stmt.executeUpdate();
+            connection.close();
+        } catch (Exception e) {
         }
         return false;
     }

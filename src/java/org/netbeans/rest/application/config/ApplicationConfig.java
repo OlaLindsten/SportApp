@@ -29,6 +29,8 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(nu.te4.services.CORSFiliter.class);
+        resources.add(nu.te4.services.LoginService.class);
         resources.add(nu.te4.services.SportService.class);
     }
     
