@@ -94,7 +94,7 @@ public class SportsBean {
             stmt.executeUpdate();
             return true;
         } catch (Exception e) {
-            System.out.println("ERRPR: " + e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
             return false;
         }
     }
